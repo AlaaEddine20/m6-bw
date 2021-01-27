@@ -4,6 +4,8 @@ const cloudinary = require("../../utilities/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const Post = require("../../utilities/db").Post;
 
+const verify = require("../auth/verifyToken");
+
 // router
 const router = express.Router();
 // Storage
@@ -18,19 +20,25 @@ const cloudinaryStorage = multer({
 });
 
 // ADD NEW POST
-router.post("/", cloudinaryStorage.array("image", 2), async (req, res) => {
-  try {
-    console.log(req.files);
-    const newPost = await Post.create({
-      ...req.body,
-      image: req.files[0].path,
-    });
-    res.status(201).send(newPost);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
+router.post(
+  "/",
+  cloudinaryStorage.array("image", 2),
+  verify,
+  async (req, res) => {
+    try {
+      console.log(req.files);
+      const newPost = await Post.create({
+        ...req.body,
+        image: req.files[0].path,
+        userId: req.user._id,
+      });
+      res.status(201).send(newPost);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 // GET ALL POSTS with likes
 router.get("/", async (req, res) => {
