@@ -16,14 +16,6 @@ module.exports = (sequelize, DataTypes) => {
     image: {
       type: DataTypes.STRING,
     },
-    // likeCount: {
-    //   type: DataTypes.INTEGER,
-    //   defaultValue: 0,
-    // },
-    // isLiked: {
-    //   type: DataTypes.BOOLEAN,
-    //   defaultValue: false,
-    // },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   });

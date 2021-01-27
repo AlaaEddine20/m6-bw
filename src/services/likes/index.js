@@ -6,11 +6,7 @@ const Post = require("../../utilities/db").Post;
 // ROUTER
 const router = express.Router();
 
-/* get /:postId   
-await Like.count({where:{postID:req.params.postId}}) 
-check if this specific user liked this specific post
-if liked?  isliked:true else isLiked
-*/
+// show if user liked a post and how many likes a post has
 router.get("/:postId/:userId", async (req, res, next) => {
   const totalLikes = await Like.count({ where: { postId: req.params.postId } });
   let isLiked = false;
@@ -25,6 +21,7 @@ router.get("/:postId/:userId", async (req, res, next) => {
   res.send({ total: totalLikes, isLiked });
 });
 
+// user can like and dislike a specific post
 router.post("/:postId/:userId", async (req, res) => {
   try {
     const like = await Like.findOne({
@@ -51,17 +48,5 @@ router.post("/:postId/:userId", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-
-/*res.send({likes:totalCount, isLiked:true/false
-})
-*/
-
-/**
- * post /:postId/:userId
- *
- * ..check id user liked this post before
- * if liked ? delete
- * else create
- */
 
 module.exports = router;
