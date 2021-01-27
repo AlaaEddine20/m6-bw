@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Post = sequelize.define("Post", {
+  const Post = sequelize.define("post", {
     _id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -13,16 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       required: true,
     },
-    // likeCount: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: true,
-    // },
+    image: {
+      type: DataTypes.STRING,
+    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   });
   Post.associate = (models) => {
     Post.belongsTo(models.User);
-    // Post.hasMany(models.Like);
+    Post.hasMany(models.Like);
   };
   return Post;
 };
