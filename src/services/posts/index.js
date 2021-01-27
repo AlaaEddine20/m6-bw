@@ -3,7 +3,6 @@ const multer = require("multer");
 const cloudinary = require("../../utilities/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const Post = require("../../utilities/db").Post;
-// const Like = require("../../db").User;
 
 // router
 const router = express.Router();
