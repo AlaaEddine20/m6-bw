@@ -1,13 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
-  const Like = sequelize.define("Like", {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+  const Like = sequelize.define(
+    "like",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
     },
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-  });
+    { timestamps: false }
+  );
   Like.associate = (models) => {
     Like.belongsTo(models.User);
     Like.belongsTo(models.Post);
