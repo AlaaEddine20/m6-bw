@@ -21,6 +21,7 @@ server.use(express.json());
 
 // SERVER
 server.use("/posts", postRouter);
+server.use("/post/likes", likesRouter);
 server.use("/user", userRouter);
 server.use("/experiences", experiencesRoute);
 server.use("/api/user", authRouter);
@@ -29,7 +30,7 @@ server.use(notFoundHandler);
 server.use(genericErrorHandler);
 
 models.sequelize
-  .sync({ force: false})
+  .sync({ force: true })
 
   .then((result) => {
     server.listen(port || 3001, () => console.log("Running on port " + port));

@@ -20,17 +20,15 @@ const cloudMulter = multer({
   storage: cloudStorage,
 });
 
-router
-  .route("/")
-  .get(verify, async (req, res, next) => {
-    try {
-      const data = await User.findAll({});
-      res.send(data);
-    } catch (e) {
-      console.log(e);
-      next(e);
-    }
-  })
+router.route("/").get(verify, async (req, res, next) => {
+  try {
+    const data = await User.findAll({});
+    res.send(data);
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
+});
 
 router
   .route("/:id")
@@ -74,10 +72,9 @@ router
     }
   });
 
-
 router.put(
   "/:id/upload",
-  cloudMulter.single("userImage"), verify,
+  cloudMulter.single("userImage"),
   async (req, res, next) => {
     try {
       const newImage = {
