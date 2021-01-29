@@ -90,10 +90,10 @@ router.get("/profile/userName/experiences",async (req, res, next)=>{
     next(error);
   }
 });
-router.post("/profile/userName/experiences",async (req, res, next)=>{
+router.post("/profile/:id/experiences",async (req, res, next)=>{
   try {
-    console.log(req.body)
-    const newExperience = await Experience.create(req.body);
+     
+    const newExperience = await Experience.create(req.body,{where:{id:req.params.id}});
   
     res.status(200).send(newExperience)
   } catch (error) {
