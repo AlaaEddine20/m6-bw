@@ -2,9 +2,9 @@ const express = require("express");
 const User = require("../../utilities/db").User;
 const { Op } = require("sequelize");
 const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../../utilities/cloudinary");
 const upload = multer({});
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const router = express.Router();
 const PDFDocument = require("pdfkit");
 const { heightOfString } = require("pdfkit");
@@ -20,17 +20,26 @@ const cloudMulter = multer({
   storage: cloudStorage,
 });
 
+
 router
   .route("/")
   .get(verify, async (req, res, next) => {
     try {
-      const data = await User.findAll({});
+      const data = await User.findAll(  {
+        where: {
+          id: {
+            [Op.not]: req.user._id
+          }
+        }
+      });
+      
       res.send(data);
     } catch (e) {
       console.log(e);
       next(e);
     }
   })
+
 
 router
   .route("/:id")
@@ -74,10 +83,11 @@ router
     }
   });
 
-
 router.put(
-  "/:id/upload",
-  cloudMulter.single("userImage"), verify,
+
+  "/:id/upload", verify,
+  cloudMulter.single("userImage"), 
+
   async (req, res, next) => {
     try {
       const newImage = {

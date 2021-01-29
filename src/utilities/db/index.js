@@ -2,6 +2,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const Post = require("./Post");
 const Like = require("./Likes");
 const User = require("./user");
+const Comment = require("./comment");
 const Experience = require("./experiences");
 
 const sequelize = new Sequelize(
@@ -9,10 +10,10 @@ const sequelize = new Sequelize(
   process.env.PGUSER,
   process.env.PGPASSWORD,
   {
-    host: process.env.PGHOST,
+    // host: process.env.PGHOST,
     port: process.env.PGPORT,
     dialect: "postgres",
-    // dialectOptions:{ssl:{require:true,rejectUnauthorized:false,},}
+    dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
   }
 );
 
@@ -27,6 +28,7 @@ const models = {
   User: User(sequelize, DataTypes),
   Post: Post(sequelize, DataTypes),
   Like: Like(sequelize, DataTypes),
+  Comment: Comment(sequelize, DataTypes),
   Experience: Experience(sequelize, DataTypes),
 };
 
@@ -41,5 +43,4 @@ Object.keys(models).forEach((modelName) => {
 models.sequelize = sequelize;
 // Include all configurations
 models.Sequelize = Sequelize;
-
 module.exports = models;
