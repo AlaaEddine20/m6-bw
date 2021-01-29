@@ -44,7 +44,6 @@ router.post("/:postId/:userId", async (req, res) => {
       res.send("deleted");
     }
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: error.message });
   }
 });

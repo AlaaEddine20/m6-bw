@@ -24,9 +24,8 @@ router.post(
   "/",
   cloudinaryStorage.array("image", 2),
   verify,
-  async (req, res) => {
+  async (req, res, next) => {
     try {
-      console.log(req.files);
       const newPost = await Post.create({
         ...req.body,
         image: req.files[0].path,
@@ -34,7 +33,6 @@ router.post(
       });
       res.status(201).send(newPost);
     } catch (error) {
-      console.log(error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -46,7 +44,6 @@ router.get("/", async (req, res) => {
     const posts = await Post.findAll({});
     res.send(posts);
   } catch (error) {
-    console.log(error);
     res.status(404).json({ error: error.message });
   }
 });
@@ -59,7 +56,6 @@ router.get("/:id", async (req, res) => {
     });
     res.send(requestedPost);
   } catch (error) {
-    console.log(error);
     res.status(404).json({ error: error.message });
   }
 });
@@ -74,7 +70,6 @@ router.put("/:id", async (req, res) => {
     });
     res.send(updatedPost[1]);
   } catch (error) {
-    console.log(error);
     res.status(404).json({ error: error.message });
   }
 });
@@ -86,7 +81,6 @@ router.delete("/:id", async (req, res) => {
       if (deleted === 1) res.send("Deleted!");
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });

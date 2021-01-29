@@ -6,6 +6,7 @@ const {
   badRequestHandler,
   notFoundHandler,
   genericErrorHandler,
+  unauthorizedHandler,
 } = require("./utilities/errorHandling");
 // ROUTERS
 const postRouter = require("./services/posts/index");
@@ -28,9 +29,10 @@ server.use("/api/user", authRouter);
 server.use(badRequestHandler);
 server.use(notFoundHandler);
 server.use(genericErrorHandler);
+server.use(unauthorizedHandler);
 
 models.sequelize
-  .sync({ force: true })
+  .sync({ force: false })
 
   .then((result) => {
     server.listen(port || 3001, () => console.log("Running on port " + port));
