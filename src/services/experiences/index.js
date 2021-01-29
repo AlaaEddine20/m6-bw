@@ -1,12 +1,13 @@
 const express = require("express");
 const Experience = require("../../utilities/db").Experience;
 const router = express.Router();
-
+const verify = require("../auth/verifyToken");
 const multer = require("multer");
 const cloudinary = require("../../utilities/cloudinary");
 const upload = multer({});
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const PDFDocument = require("pdfkit");
+
 const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -60,9 +61,10 @@ router.get("/profile/userName/experiences/CSV", async (req, res, next) => {
     next(error);
   }
 });
-router.get("/profile/userName/experiences/:expId", async (req, res, next)=> {
+
+router.get("/profile/userName/experiences/:userId", async (req, res, next)=> {
   try {
-    const singleExperince = await Experience.findByPk(req.params.expId);
+    const singleExperince = await Experience.findAll({where: { userId: req.params.userId},});
     res.status(200).send(singleExperince);
   } catch (error) {
     console.log(error);
@@ -72,8 +74,11 @@ router.get("/profile/userName/experiences/:expId", async (req, res, next)=> {
 router.put("/profile/userName/experiences/:expId", async (req, res, next)=> {
   try {
     const updatedExperince = await Experience.update(req.body, {
-      where: { id: req.params.expId },
       returning: true,
+      plain: true,
+      where: {
+        id: req.params.expId,
+      },
     });
     res.send(updatedExperince);
   } catch (error) {
@@ -90,36 +95,23 @@ router.get("/profile/userName/experiences",async (req, res, next)=>{
     next(error);
   }
 });
-router.post("/profile/userName/experiences",async (req, res, next)=>{
+
+
+router.post("/profile/userName/experiences", verify, async (req, res,next) => {
   try {
-    const newExperience = await Experience.create(req.body);
-    res.status(200).send(newExperience);
+   console.log(req.body)
+    const newExperience = await Experience.create({
+      ...req.body,
+      userId: req.user._id,
+    });
+    res.status(201).send(newExperience);
   } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
     next(error)
   }
 });
-router.get("/profile/userName/experiences/:expid", async (res, req, next) => {
-  try {
-    const singleExperince = await findByPk(req.params.expid);
-    res.status(200).send(singleExperince);
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
 
-router.put("/profile/userName/experiences/:expId", async (req, res, next)=> {
-  try {
-    const updatedExperince = await Experience.update(req.body, {
-      where: { id: req.params.expId },
-      returning: true,
-    });
-    res.send(updatedExperince);
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
 
 router.delete("/profile/userName/experiences/:expId", async (req, res, next) => {
   try {
@@ -133,12 +125,13 @@ router.delete("/profile/userName/experiences/:expId", async (req, res, next) => 
   }
 });
 
-
 router.put(
   "/:id/upload",
+  verify,
 cloudMulter.single("experienceImage"),
   async (req, res, next) => {
     try {
+      console.log(req.file.path)
       const alteredExperience = await Experience.update(
         { image: req.file.path },
         {
@@ -156,14 +149,5 @@ cloudMulter.single("experienceImage"),
   }
 );
 
-router.get("/profile/userName/experiences", async (res, req, next) => {
-  try {
-    const AllExperiences = await Experiences.findAll();
-    res.status(200).send(AllExperiences);
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
 
-module.exports = router;
+module.exports= router

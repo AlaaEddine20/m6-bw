@@ -4,6 +4,9 @@ const cloudinary = require("../../utilities/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const Post = require("../../utilities/db").Post;
 
+const Comment = require("../../utilities/db").Comment;
+const User = require("../../utilities/db").User;
+
 const verify = require("../auth/verifyToken");
 
 // router
@@ -20,28 +23,30 @@ const cloudinaryStorage = multer({
 });
 
 // ADD NEW POST
-router.post(
-  "/",
-  cloudinaryStorage.array("image", 2),
-  verify,
-  async (req, res, next) => {
-    try {
-      const newPost = await Post.create({
-        ...req.body,
-        image: req.files[0].path,
-        userId: req.user._id,
-      });
-      res.status(201).send(newPost);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
+
+router.post("/", cloudinaryStorage.array("image", 2),verify, async (req, res) => {
+  try {
+    const newPost = await Post.create({
+      ...req.body,
+      image: req.files[0].path,
+      userId: req.user._id,
+    });
+    res.status(201).send(newPost);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+
   }
 );
 
 // GET ALL POSTS with likes
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.findAll({});
+    const posts = await Post.findAll({include: [{
+      model: Comment},
+      {model: User,
+      attributes: ['username', 'image']}
+    ]});
     res.send(posts);
   } catch (error) {
     res.status(404).json({ error: error.message });
