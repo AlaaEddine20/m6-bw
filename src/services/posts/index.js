@@ -3,8 +3,10 @@ const multer = require("multer");
 const cloudinary = require("../../utilities/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const Post = require("../../utilities/db").Post;
+
 const Comment = require("../../utilities/db").Comment;
 const User = require("../../utilities/db").User;
+
 const verify = require("../auth/verifyToken");
 
 // router
@@ -21,6 +23,7 @@ const cloudinaryStorage = multer({
 });
 
 // ADD NEW POST
+
 router.post("/", cloudinaryStorage.array("image", 2),verify, async (req, res) => {
   try {
     const newPost = await Post.create({
@@ -32,9 +35,9 @@ router.post("/", cloudinaryStorage.array("image", 2),verify, async (req, res) =>
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
-  }
-});
 
+  }
+);
 
 // GET ALL POSTS with likes
 router.get("/", async (req, res) => {
@@ -46,7 +49,6 @@ router.get("/", async (req, res) => {
     ]});
     res.send(posts);
   } catch (error) {
-    console.log(error);
     res.status(404).json({ error: error.message });
   }
 });
@@ -59,7 +61,6 @@ router.get("/:id", async (req, res) => {
     });
     res.send(requestedPost);
   } catch (error) {
-    console.log(error);
     res.status(404).json({ error: error.message });
   }
 });
@@ -74,7 +75,6 @@ router.put("/:id", async (req, res) => {
     });
     res.send(updatedPost[1]);
   } catch (error) {
-    console.log(error);
     res.status(404).json({ error: error.message });
   }
 });
@@ -86,7 +86,6 @@ router.delete("/:id", async (req, res) => {
       if (deleted === 1) res.send("Deleted!");
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });

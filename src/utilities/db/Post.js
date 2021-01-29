@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Post = sequelize.define("Post", {
+  const Post = sequelize.define("post", {
     _id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -16,14 +16,6 @@ module.exports = (sequelize, DataTypes) => {
     image: {
       type: DataTypes.STRING,
     },
-    likeCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    // isLiked: {
-    //   type: DataTypes.BOOLEAN,
-    //   defaultValue: false,
-    // },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   });

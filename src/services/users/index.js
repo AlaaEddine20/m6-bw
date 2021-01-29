@@ -20,6 +20,7 @@ const cloudMulter = multer({
   storage: cloudStorage,
 });
 
+
 router
   .route("/")
   .get(verify, async (req, res, next) => {
@@ -38,6 +39,7 @@ router
       next(e);
     }
   })
+
 
 router
   .route("/:id")
@@ -81,10 +83,11 @@ router
     }
   });
 
-
 router.put(
+
   "/:id/upload", verify,
   cloudMulter.single("userImage"), 
+
   async (req, res, next) => {
     try {
       const newImage = {

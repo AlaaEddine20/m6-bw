@@ -6,6 +6,7 @@ const {
   badRequestHandler,
   notFoundHandler,
   genericErrorHandler,
+  unauthorizedHandler,
 } = require("./utilities/errorHandling");
 // ROUTERS
 const postRouter = require("./services/posts/index");
@@ -22,6 +23,7 @@ server.use(express.json());
 
 // SERVER
 server.use("/posts", postRouter);
+server.use("/post/likes", likesRouter);
 server.use("/user", userRouter);
 server.use("/experiences", experiencesRoute);
 server.use("/comments", commentRouter)
@@ -29,9 +31,10 @@ server.use("/api/user", authRouter);
 server.use(badRequestHandler);
 server.use(notFoundHandler);
 server.use(genericErrorHandler);
+server.use(unauthorizedHandler);
 
 models.sequelize
-  .sync({ force: false})
+  .sync({ force: true })
 
   .then((result) => {
     server.listen(port || 3001, () => console.log("Running on port " + port));
