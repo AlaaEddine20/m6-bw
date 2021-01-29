@@ -1,5 +1,6 @@
 const express = require("express");
 const User = require("../../utilities/db").User;
+const Experience = require("../../utilities/db/experiences").Experience
 const { Op } = require("sequelize");
 const multer = require("multer");
 const cloudinary = require("../../utilities/cloudinary");
@@ -9,7 +10,8 @@ const router = express.Router();
 const PDFDocument = require("pdfkit");
 const { heightOfString } = require("pdfkit");
 const verify = require("../auth/verifyToken");
-
+const pdf = require('html-pdf');
+const dynamicResume = require('./docs/resume-maker')
 const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -19,6 +21,8 @@ const cloudStorage = new CloudinaryStorage({
 const cloudMulter = multer({
   storage: cloudStorage,
 });
+const options ={ "height": "10.5in",        // allowed units: mm, cm, in, px
+"width": "8in",  }          // allowed units: mm, cm, in, px}
 
 router
   .route("/")
@@ -44,6 +48,7 @@ router
   .get(verify, async (req, res, next) => {
     try {
       const data = await User.findByPk(req.params.id);
+     
       res.send(data);
     } catch (e) {
       console.log(e);
@@ -114,43 +119,55 @@ router.put(
   Generates and download a PDF with the CV of the user (details, picture, experiences) */
 
 router.get("/:id/cv", async (req, res, next) => {
+ 
   try {
     let pdfDoc = new PDFDocument();
     const data = await User.findByPk(req.params.id);
-    if (data) {
-      res.setHeader("Content-Type", "application/pdf");
-      pdfDoc.fontSize(30).text(`${data.name} ${data.surname} CV`, {
-        width: 410,
-        align: "center",
-        height: 200,
-        lineGap: 10,
-      });
+    const experiences = await Experience.findAll({where: {userId:req.params.id}})
+    console.log(Experience)
+    if (data && Experience.length>0) {
+      // res.setHeader("Content-Type", "application/pdf");
+      // pdfDoc.fontSize(30).text(`${data.name} ${data.surname} CV`, {
+      //   width: 410,
+      //   align: "center",
+      //   height: 200,
+      //   lineGap: 10,
+      // });
 
-      pdfDoc.fontSize(12).text("- name: " + data.name, 100);
-      pdfDoc.fontSize(12).text("- surname: " + data.surname, 100);
-      pdfDoc.fontSize(12).text("- email: " + data.email, 100);
-      pdfDoc.fontSize(12).text("- title: " + data.title, 100);
-      pdfDoc.fontSize(12).text("- area: " + data.area, {
-        lineGap: 22,
+      // pdfDoc.fontSize(12).text("- name: " + data.name, 100);
+      // pdfDoc.fontSize(12).text("- surname: " + data.surname, 100);
+      // pdfDoc.fontSize(12).text("- email: " + data.email, 100);
+      // pdfDoc.fontSize(12).text("- title: " + data.title, 100);
+      // pdfDoc.fontSize(12).text("- area: " + data.area, {
+      //   lineGap: 22,
+      // });
+      // pdfDoc.fontSize(25).text("ABOUT ME", {
+      //   lineGap: 10,
+      // });
+      // pdfDoc.fontSize(12).text(data.bio, {
+      //   columns: 3,
+      //   columnGap: 15,
+      //   height: 100,
+      //   width: 465,
+      //   align: "justify",
+      // });
+      // pdfDoc.fontSize(15).text(" ", {
+      //   lineGap: 13,
+      // });
+      // pdfDoc.fontSize(25).text("EXPERIENCES", {
+      //   lineGap: 20,
+      // });
+      // pdfDoc.pipe(res);
+      // pdfDoc.end();
+      experiences.map((experience)=>{
+      pdf.create(dynamicResume(data,experience, themeOptions),options).toFile(__dirname+"/docs/resume-maker.pdf", (err, response)=>{
+        if (err) throw Error("File is not created");
+            console.log(response.filename);
+            res.sendFile(response.filename);
       });
-      pdfDoc.fontSize(25).text("ABOUT ME", {
-        lineGap: 10,
-      });
-      pdfDoc.fontSize(12).text(data.bio, {
-        columns: 3,
-        columnGap: 15,
-        height: 100,
-        width: 465,
-        align: "justify",
-      });
-      pdfDoc.fontSize(15).text(" ", {
-        lineGap: 13,
-      });
-      pdfDoc.fontSize(25).text("EXPERIENCES", {
-        lineGap: 20,
-      });
-      pdfDoc.pipe(res);
-      pdfDoc.end();
+    })
+    const filePath = __dirname + '/docs/resume-maker.pdf';
+    res.download(filePath);
     } else {
       const err = new Error();
       next(err);
