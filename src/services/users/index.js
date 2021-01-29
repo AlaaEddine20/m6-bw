@@ -113,51 +113,63 @@ router.put(
 /*  - GET https://yourapi.herokuapp.com/api/profile/{userId}/CV
   Generates and download a PDF with the CV of the user (details, picture, experiences) */
 
-router.get("/:id/cv", async (req, res, next) => {
-  try {
-    let pdfDoc = new PDFDocument();
-    const data = await User.findByPk(req.params.id);
-    if (data) {
-      res.setHeader("Content-Type", "application/pdf");
-      pdfDoc.fontSize(30).text(`${data.name} ${data.surname} CV`, {
-        width: 410,
-        align: "center",
-        height: 200,
-        lineGap: 10,
-      });
 
-      pdfDoc.fontSize(12).text("- name: " + data.name, 100);
-      pdfDoc.fontSize(12).text("- surname: " + data.surname, 100);
-      pdfDoc.fontSize(12).text("- email: " + data.email, 100);
-      pdfDoc.fontSize(12).text("- title: " + data.title, 100);
-      pdfDoc.fontSize(12).text("- area: " + data.area, {
-        lineGap: 22,
-      });
-      pdfDoc.fontSize(25).text("ABOUT ME", {
-        lineGap: 10,
-      });
-      pdfDoc.fontSize(12).text(data.bio, {
-        columns: 3,
-        columnGap: 15,
-        height: 100,
-        width: 465,
-        align: "justify",
-      });
-      pdfDoc.fontSize(15).text(" ", {
-        lineGap: 13,
-      });
-      pdfDoc.fontSize(25).text("EXPERIENCES", {
-        lineGap: 20,
-      });
-      pdfDoc.pipe(res);
-      pdfDoc.end();
-    } else {
-      const err = new Error();
-      next(err);
+  router.get("/:id/cv", async (req, res, next) => {
+    try {
+      let pdfDoc = new PDFDocument();
+      const data = await User.findByPk(req.params.id, {include: [{
+        model: Experience}
+      ]});
+      if (data) {
+        res.setHeader("Content-Type", "application/pdf");
+        pdfDoc.fontSize(30).text(`${data.name} ${data.surname} CV`, {
+          width: 410,
+          align: "center",
+          height: 200,
+          lineGap: 10,
+        });
+  
+        pdfDoc.fontSize(12).text("- name: " + data.name, 100);
+        pdfDoc.fontSize(12).text("- surname: " + data.surname, 100);
+        pdfDoc.fontSize(12).text("- email: " + data.email, 100);
+        pdfDoc.fontSize(12).text("- title: " + data.title, 100);
+        pdfDoc.fontSize(12).text("- area: " + data.area, {
+          lineGap: 22,
+        });
+        pdfDoc.fontSize(25).text("ABOUT ME", {
+          lineGap: 10,
+        });
+        pdfDoc.fontSize(12).text(data.bio, {
+          columns: 3,
+          columnGap: 15,
+          height: 100,
+          width: 465,
+          align: "justify",
+        });
+        pdfDoc.fontSize(15).text(" ", {
+          lineGap: 13,
+        });
+        pdfDoc.fontSize(25).text("EXPERIENCES", {
+          lineGap: 20,
+        });
+        pdfDoc.fontSize(15).text('-' + data.experiences[0].role + ' at '+ data.experiences[0].company, {
+          lineGap: 20,
+        });
+  
+       if(data.experiences.length >1 ){
+        pdfDoc.fontSize(15).text('-' + data.experiences[1].role + ' at '+ data.experiences[1].company, {
+          lineGap: 20,
+        });
+       }
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+      } else {
+        const err = new Error();
+        next(err);
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
-  }
-});
-
+  });
+  
 module.exports = router;
