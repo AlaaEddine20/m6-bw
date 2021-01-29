@@ -92,9 +92,12 @@ router.get("/profile/userName/experiences",async (req, res, next)=>{
 });
 router.post("/profile/userName/experiences",async (req, res, next)=>{
   try {
+    console.log(req.body)
     const newExperience = await Experience.create(req.body);
-    res.status(200).send(newExperience);
+  
+    res.status(200).send(newExperience)
   } catch (error) {
+    console.log(error)
     next(error)
   }
 });
