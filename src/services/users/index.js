@@ -27,14 +27,19 @@ const options ={ "height": "10.5in",        // allowed units: mm, cm, in, px
 router
   .route("/")
   .get(verify, async (req, res, next) => {
+    
     try {
       const data = await User.findAll(  {
         where: {
           id: {
             [Op.not]: req.user._id
           }
+          
         }
+        
       });
+      let token = localStorage.getItem("token");
+      let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.token });
       
       res.send(data);
     } catch (e) {
@@ -123,8 +128,8 @@ router.get("/:id/cv", async (req, res, next) => {
   try {
     let pdfDoc = new PDFDocument();
     const data = await User.findByPk(req.params.id);
-    const experiences = await Experience.findAll({where: {userId:req.params.id}})
-    console.log(Experience)
+    const experiences = await Experience.findAll({where: {username:req.user.username}})
+    console.log(experiences)
     if (data && Experience.length>0) {
       // res.setHeader("Content-Type", "application/pdf");
       // pdfDoc.fontSize(30).text(`${data.name} ${data.surname} CV`, {
