@@ -34,7 +34,7 @@ server.use(genericErrorHandler);
 server.use(unauthorizedHandler);
 
 models.sequelize
-  .sync({ force: true })
+  .sync({ force: false })
 
   .then((result) => {
     server.listen(port || 3001, () => console.log("Running on port " + port));
