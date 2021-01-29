@@ -29,7 +29,7 @@ server.use(notFoundHandler);
 server.use(genericErrorHandler);
 
 models.sequelize
-  .sync({ force: false})
+  .sync({ force: false })
 
   .then((result) => {
     server.listen(port || 3001, () => console.log("Running on port " + port));
